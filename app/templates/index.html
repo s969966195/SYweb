@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}SY{% endblock %}
+
+
+{% block page_content %}
+<div class="page-header">
+    <p>{{ moment(current_time).format('LLL') }}   {{ moment(current_time).fromNow(refresh=True) }}</p>
+    <h1>你好,{% if name %}{{ name }}{% else %}陌生人{% endif %}!</h1>
+    {% if not known %}
+    <p>很高兴认识你！</p>
+    {% else %}
+    <p>很高兴再次见到你！</p>
+    {% endif %}
+</div>
+{{ wtf.quick_form(form) }}
+{% endblock %}
