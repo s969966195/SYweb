@@ -2,22 +2,24 @@
 
 {% block title %}SY{% endblock %}
 
-
-{% block head %}
-{{ super() }}
+{% block metas %}
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="">
 <meta name="keywords" content="">
-<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-<link href="{{ url_for('static',filename='bootstrap.min.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<link rel="shortcut icon" href="{{ url_for('static', filename='basic/favicon.ico') }}" type="image/x-icon">
+<link rel="icon" href="{{ url_for('static', filename='basic/favicon.ico') }}" type="image/x-icon">
+<link href="{{ url_for('static',filename='navigation/bootstrap.min.css') }}" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.css" rel="stylesheet">
 <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-<link href="{{ url_for('static',filename='animate.css') }}" rel="stylesheet">
-<link href="{{ url_for('static',filename='bootsnav.css') }}" rel="stylesheet">
-<link href="{{ url_for('static',filename='style.css') }}" rel="stylesheet">
+<link href="{{ url_for('static',filename='navigation/animate.css') }}" rel="stylesheet">
+<link href="{{ url_for('static',filename='navigation/bootsnav.css') }}" rel="stylesheet">
+<link href="{{ url_for('static',filename='navigation/style.css') }}" rel="stylesheet">
 {% endblock %}
 
 {% block navbar %}
@@ -190,18 +192,17 @@
     <!-- End Navigation -->
 
     <div class="clearfix"></div>
-
-    	<!-- START JAVASCRIPT -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="{{ url_for('static',filename='bootstrap.min.js') }}"></script>
-
-    <!-- Bootsnavs -->
-    <script src="{{ url_for('static',filename='navigation/bootsnav.js') }}"></script>
 {% endblock %}
 
 {% block scripts %}
 {{ super() }}
+<!-- START JAVASCRIPT -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="{{ url_for('static',filename='navigation/bootstrap.min.js') }}"></script>
+
+<!-- Bootsnavs -->
+<script src="{{ url_for('static',filename='navigation/bootsnav.js') }}"></script>
 {{ moment.include_moment() }}
 {% endblock %}
 

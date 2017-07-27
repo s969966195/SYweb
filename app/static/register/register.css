@@ -1,0 +1,24 @@
+*{
+margin:0px;
+padding:0px;
+}
+
+body{
+background:url(top-bg.jpg) no-repeat fixed top; 
+background-size:100% 25%;
+}
+
+.con{
+position:fixed;
+left:80px;
+top:200px;
+}
+
+h1.title{
+font-size:50px;
+}
+
+.form-control{
+width:40%;
+height:45px;
+}

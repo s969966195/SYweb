@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}确认您的账户{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>
+        您好, {{ current_user.username }}!
+    </h1>
+    <h3>您还没有确认您的账户。</h3>
+    <p>
+        在您访问本网站之前，您需要确认您的帐户。
+        检查您的收件箱，您应该已收到一封电子邮件与确认链接。
+    </p>
+    <p>
+        需要新的确认邮件？
+        <a href="{{ url_for('auth.resend_confirmation') }}">Click here</a>
+    </p>
+</div>
+{% endblock %}

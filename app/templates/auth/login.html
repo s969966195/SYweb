@@ -1,0 +1,33 @@
+{% extends "bootstrap/base.html" %}
+
+{% block title %}登录{% endblock %}
+
+{% block metas %}
+<meta charset='UTF-8'>
+{% endblock %}
+
+{% block styles %}
+<link rel='stylesheet' href='{{ url_for('static',filename='login/login.css') }}'>
+{% endblock %}
+
+{% block content %}
+<div id="loginform">
+    <a id="register" href='{{ url_for('auth.register') }}'>注册</a>
+    <div id="mainlogin">
+        <div id="or">or</div>
+        <h1>欢迎来到孙越的小站</h1>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            {{ form.email(class="in",type="text",placeholder="用户名或邮箱") }}
+            {{ form.password(class="in",type="password",placeholder="密码") }}
+            {{ form.remember_me(class="remember_me") }}
+            {{ form.submit(class="button",type="submit")}}
+            {% for message in get_flashed_messages() %}
+                <div class='message'>{{ message }}</div>
+            {% endfor %}
+        </form>
+        <p class="remember_me_p">记住我</p>
+        <div class="note"><a href="#">忘记密码?</a></div>
+    </div>
+</div>
+{% endblock %}
