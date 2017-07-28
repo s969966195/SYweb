@@ -1,0 +1,9 @@
+亲爱的 {{ user.username }},
+
+欢迎来到孙越的小站
+
+确认您的账户请点击以下链接：
+
+{{ url_for('auth.confirm', token=token, _external=True) }}
+
+孙越

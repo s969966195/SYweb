@@ -1,0 +1,6 @@
+<p>亲爱的 {{ user.username }},</p>
+<p>欢迎来到 <b>孙越的小站</b>!</p>
+<p>确认您的账户请 <a href="{{ url_for('auth.confirm', token=token, _external=True) }}">点击这里</a>.</p>
+<p>或者，您可以在浏览器的地址栏中粘贴以下链接：</p>
+<p>{{ url_for('auth.confirm', token=token, _external=True) }}</p>
+<p>孙越</p>

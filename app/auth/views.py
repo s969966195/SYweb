@@ -2,7 +2,7 @@
 from flask import render_template,redirect,request,url_for,flash
 from flask_login import login_user,logout_user,login_required,current_user
 from . import auth
-from .forms import LoginForm,RegistrationForm
+from .forms import LoginForm,RegistrationForm,PasswordResetRequestForm,PasswordResetForm
 from ..models import User
 from .. import db
 from ..email import send_email
@@ -72,3 +72,35 @@ def resend_confirmation():
     send_email(current_user.email,u'确认您的账户','auth/email/confirm',user=current_user,token=token)
     flash(u'一封新的确认邮件已经发送到您的邮箱')
     return redirect(url_for('main.index'))
+
+reset_data={}
+
+@auth.route('/reset',methods=['GET','POST'])
+def password_reset_request():
+    global reset_data
+    form=PasswordResetRequestForm()
+    if form.validate_on_submit():
+        user=User.query.filter_by(email=form.email.data).first()
+        if user:
+            reset_token=user.generate_reset_token()
+            reset_data=user.get_reset_token(reset_token)
+            send_email(user.email,u'重置密码','auth/email/reset_password',user=user,token=reset_token,next=request.args.get('next'))
+            flash(u'已向您的邮箱发送重置密码邮件')
+            return redirect(url_for('auth.login'))
+    return render_template('auth/reset_password.html',form=form)
+
+@auth.route('/reset/<token>',methods=['GET','POST'])
+def password_reset(token):
+    global reset_data
+    print reset_data
+    if not current_user.is_anonymous:
+        return redirect(url_for('main.index'))
+    form=PasswordResetForm()
+    if form.validate_on_submit():
+        user=User.query.filter_by(id=reset_data['reset']).first()
+        if user.reset_password(token,form.password.data):
+            flash(u'您的密码已经重置')
+            return redirect(url_for('auth.login'))
+        else:
+            return redirect(url_for('main.index'))
+    return render_template('auth/reset_password.html',form=form)

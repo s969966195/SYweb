@@ -27,7 +27,7 @@
             {% endfor %}
         </form>
         <p class="remember_me_p">记住我</p>
-        <div class="note"><a href="#">忘记密码?</a></div>
+        <div class="note"><a href="{{ url_for('auth.password_reset_request') }}">忘记密码?</a></div>
     </div>
 </div>
 {% endblock %}
