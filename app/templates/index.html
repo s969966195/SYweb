@@ -1,18 +1,36 @@
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
 
 {% block title %}SY{% endblock %}
 
+{% block scripts %}
+{{ super() }}
+{{ pagedown.include_pagedown() }}
+{% endblock %}
 
 {% block page_content %}
 <div class="page-header">
     <p>{{ moment(current_time).format('LLL') }}   {{ moment(current_time).fromNow(refresh=True) }}</p>
     <h1>你好,{% if current_user.username %}{{ current_user.username }}{% else %}陌生人{% endif %}!</h1>
-    {% if not known %}
-    <p>很高兴认识你！</p>
-    {% else %}
-    <p>很高兴再次见到你！</p>
+</div>
+<div>
+    {% if current_user.can(Permission.WRITE_ARTICLES) %}
+    {{ wtf.quick_form(form) }}
     {% endif %}
 </div>
-{{ wtf.quick_form(form) }}
+<div class="post-tabs">
+    <ul class="nav nav-tabs">
+        <li{% if not show_followed %} class="active"{% endif %}><a href="{{ url_for('.show_all') }}">All</a></li>
+        {% if current_user.is_authenticated %}
+        <li{% if show_followed %} class="active"{% endif %}><a href="{{ url_for('.show_followed') }}">Followers</a></li>
+        {% endif %}
+    </ul>
+    {% include '_posts.html' %}
+</div>
+{% if pagination %}
+<div class="pagination">
+    {{ macros.pagination_widget(pagination,'.index') }}
+</div>
+{% endif %}
 {% endblock %}

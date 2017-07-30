@@ -1,6 +1,7 @@
 #coding=utf-8
 '''main蓝图'''
 from flask import Blueprint
+from ..models import Permission
 
 main=Blueprint('main',__name__)
 

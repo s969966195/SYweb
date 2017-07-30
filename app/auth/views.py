@@ -55,8 +55,10 @@ def confirm(token):
 @auth.before_app_request #before_request钩子只能应用到属于蓝本的请求上，若想在蓝本中使用针对程序全局请求的钩子，用这个过滤未确认的账户
 def before_request():
     #满足以下三点会拦截请求 1.已登录 2.账户还未确认 3.请求的端点不在认证蓝本中
-    if current_user.is_authenticated and not current_user.confirmed and request.endpoint[:5]!='auth.' and request.endpoint!='static':
-        return redirect(url_for('auth.unconfirmed'))
+    if current_user.is_authenticated:
+        current_user.ping()
+        if not current_user.confirmed and request.endpoint[:5]!='auth.':
+            return redirect(url_for('auth.unconfirmed'))
 
 @auth.route('/unconfirmed')
 def unconfirmed():
@@ -104,3 +106,4 @@ def password_reset(token):
         else:
             return redirect(url_for('main.index'))
     return render_template('auth/reset_password.html',form=form)
+
