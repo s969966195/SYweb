@@ -68,6 +68,9 @@ def user(username):
 def edit_profile():
     form=EditProfileForm()
     if form.validate_on_submit():
+        if current_user.username!=form.username.data and User.query.filter_by(username=form.username.data).first():
+            flash(u'昵称已被占用')
+            return redirect(url_for('.edit_profile'))
         current_user.username=form.username.data
         current_user.location=form.location.data
         current_user.about_me=form.about_me.data
@@ -113,6 +116,18 @@ def edit_post(id):
         return redirect(url_for('.post',id=post.id))
     form.title.data=post.title
     form.text.data=post.text
+    return render_template('edit_post.html',form=form,post=post)
+
+@main.route('/edit-post',methods=['GET','POST'])
+@login_required
+def edit_post_new():
+    form=PostForm()
+    if current_user.can(Permission.WRITE_ARTICLES) and form.validate_on_submit():
+        post=Post(title=form.title.data,text=form.text.data,author=current_user._get_current_object())
+        db.session.add(post)
+        db.session.commit()
+        flash(u'发表文章成功')
+        return redirect(url_for('.index'))
     return render_template('edit_post.html',form=form)
 
 @main.route('/follow/<username>')

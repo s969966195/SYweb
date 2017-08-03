@@ -60,12 +60,18 @@ class User(UserMixin,db.Model):
     confirmed=db.Column(db.Boolean,default=False)
     location=db.Column(db.String(255))
     about_me=db.Column(db.Text())
+    about_me_html=db.Column(db.Text())
     member_since=db.Column(db.DateTime(),default=datetime.utcnow)
     last_seen=db.Column(db.DateTime(),default=datetime.utcnow) #用户每次访问网站后，这个值都会被刷新
     avatar_hash=db.Column(db.String(32))
     followed=db.relationship('Follow',foreign_keys=[Follow.follower_id],backref=db.backref('follower',lazy='joined'),lazy='dynamic',cascade='all,delete-orphan')
     followers=db.relationship('Follow',foreign_keys=[Follow.followed_id],backref=db.backref('followed',lazy='joined'),lazy='dynamic',cascade='all,delete-orphan')
     comments=db.relationship('Comment',backref='author',lazy='dynamic')
+
+    @staticmethod
+    def on_changed_about_me(target,value,oldvalue,initiator):
+        allowed_tags=['a','abbr','acronym','b','blockquote','code','em','i','li','ol','pre','strong','ul','h1','h2','h3','p']
+        target.about_me_html=bleach.linkify(bleach.clean(markdown(value,output_format='html'),tags=allowed_tags,strip=True))
 
     def follow(self,user):
         if not self.is_following(user):
@@ -189,6 +195,8 @@ class User(UserMixin,db.Model):
             except IntegrityError:
                 db.session.rollback()
 
+db.event.listen(User.about_me,'set',User.on_changed_about_me)
+
 class AnonymousUser(AnonymousUserMixin):#用户未登录时current_user的值
     def can(self,permissions):
         return False
@@ -216,17 +224,12 @@ class Post(db.Model):
     title=db.Column(db.String(255))
     publish_date=db.Column(db.DateTime(),index=True,default=datetime.utcnow)
     author_id=db.Column(db.Integer(),db.ForeignKey('users.id'))
-    text_html=db.Column(db.Text())
+    #text_html=db.Column(db.Text())
     comments=db.relationship('Comment',backref='post',lazy='dynamic')
     #tags=db.relationship('Tag',secondary=tags,backref=db.backref('posts',lazy='dynamic'))
 
     def __repr__(self):
         return "<Post '{}'>".format(self.title)
-
-    @staticmethod
-    def on_changed_text(target,value,oldvalue,initiator):
-        allowed_tags=['a','abbr','acronym','b','blockquote','code','em','i','li','ol','pre','strong','ul','h1','h2','h3','p']
-        target.text_html=bleach.linkify(bleach.clean(markdown(value,output_format='html'),tags=allowed_tags,strip=True))#markdown把文本转换成HMTL，clean删除不在白名单中的标签，linkify把纯文本中的URL转换成适当的<a>链接
 
     @staticmethod
     def generate_fake(count=100):
@@ -244,7 +247,14 @@ class Post(db.Model):
             db.session.add(p)
             db.session.commit()
 
-db.event.listen(Post.text,'set',Post.on_changed_text) #'set'事件的监听程序，只要text字段设了新值，调用函数保存在text_html中
+'''
+    @staticmethod
+    def on_changed_text(target,value,oldvalue,initiator):
+        allowed_tags=['a','abbr','acronym','b','blockquote','code','em','i','li','ol','pre','strong','ul','h1','h2','h3','p']
+        target.text_html=bleach.linkify(bleach.clean(markdown(value,output_format='html'),tags=allowed_tags,strip=True))#markdown把文本转换成HMTL，clean删除不在白名单中的标签，linkify把纯文本中的URL转换成适当的<a>链接
+'''
+
+#db.event.listen(Post.text,'set',Post.on_changed_text) #'set'事件的监听程序，只要text字段设了新值，调用函数保存在text_html中
 
 class Comment(db.Model):
     __tablename__='comments'

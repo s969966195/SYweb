@@ -1,40 +1,37 @@
-<ul class="posts">
-    {% for post in posts %}
-    <li class="post">
-        <div class="post-thumbnail">
-            <a href="{{ url_for('.user', username=post.author.username) }}">
-                <img class="img-rounded profile-thumbnail" src="{{ post.author.gravatar(size=40) }}">
-            </a>
-        </div>
+{% for post in posts %}
+    <div class="list-group-item" style="border: 0;">
         <div class="post-content">
-            <div class="post-title">{{ post.title }}</div>
-            <div class="post-date">{{ moment(post.publish_date).fromNow() }}</div>
-            <div class="post-author"><a href="{{ url_for('.user', username=post.author.username) }}">{{ post.author.username }}</a></div>
-            <div class="post-text">
-                {% if post.body_html %}
-                    {{ post.body_html | safe }}
-                {% else %}
-                    {{ post.text }}
-                {% endif %}
-            </div>
-            <div class="post-footer">
-                <a href="{{ url_for('.post',id=post.id) }}">
-                    <span class="label label-default">Permalink</span>
+            <div class="post-information">
+                <a href="{{ url_for('.post',id=post.id) }}" style="text-decoration:none">
+                    <h4>{{ post.title }}</h4>
                 </a>
+                <p>
+                    <small>发布时间：{{ moment(post.publish_date).fromNow() }}&emsp;</small>
+                    <small>
+                        作者：<a href="{{ url_for('.user', username=post.author.username) }}" style="text-decoration:none">{{ post.author.username }}</a>
+                    </small>
+                    <a href="{{ url_for('.user', username=post.author.username) }}">
+                        <img class="img-rounded profile-thumbnail" src="{{ post.author.gravatar(size=20) }}">
+                    </a>
+                </p>
+            </div>
+            <div class="post-text">
+                {{ post.text|markdown|safe|truncate(400,True) }}
+            </div>
+            <div class="post-footer" style="text-align:right">
                 {% if current_user==post.author %}
-                <a href="{{ url_for('.edit_post',id=post.id) }}">
-                    <span class="label label-primary">Edit</span>
+                <a href="{{ url_for('.edit_post',id=post.id) }}" style="text-decoration:none">
+                    <span class="label label-primary">编辑</span>
                 </a>
                 {% elif current_user.is_administrator() %}
-                <a href="{{ url_for('.edit_post',id=post.id) }}">
-                    <span class="label label-danger">Edit [Admin]</span>
+                <a href="{{ url_for('.edit_post',id=post.id) }}" style="text-decoration:none">
+                    <span class="label label-danger">编辑 [Admin]</span>
                 </a>
                 {% endif %}
-                <a href="{{ url_for('.post', id=post.id) }}#comments">
-                    <span class="label label-primary">{{ post.comments.count() }} Comments</span>
+                <a href="{{ url_for('.post', id=post.id) }}#comments" style="text-decoration:none">
+                    <span class="label label-primary">{{ post.comments.count() }} 条评论</span>
                 </a>
             </div>
         </div>
-    </li>
-    {% endfor %}
-</ul>
+    </div>
+{% endfor %}

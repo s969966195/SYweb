@@ -1,8 +1,8 @@
 #coding=utf-8
-from flask import render_template,redirect,request,url_for,flash
+from flask import render_template,redirect,request,url_for,flash,jsonify
 from flask_login import login_user,logout_user,login_required,current_user
 from . import auth
-from .forms import LoginForm,RegistrationForm,PasswordResetRequestForm,PasswordResetForm
+from .forms import LoginForm,PasswordResetRequestForm,PasswordResetForm
 from ..models import User
 from .. import db
 from ..email import send_email
@@ -27,18 +27,39 @@ def logout():
 
 @auth.route('/register',methods=['GET','POST'])
 def register():
+    '''
     form=RegistrationForm()
     if form.validate_on_submit():
         user=User(username=form.username.data)
         user.email=form.email.data
         user.password=form.password.data
+    '''
+    if request.method=="POST":
+        user=User(email=request.form.get('email'))
+        user.username=request.form.get('username')
+        user.password=request.form.get('password')
         db.session.add(user)
         db.session.commit()
         token=user.generate_confirmation_token()
         send_email(user.email,u'确认您的账户','auth/email/confirm',user=user,token=token)
         flash(u'已向您的邮箱发送确认邮件')
         return redirect(url_for('auth.login'))
-    return render_template('auth/register.html',form=form)
+    return render_template('auth/register.html')
+
+@auth.route('/registervalidate/email',methods=['POST','GET'])
+def registervalidateemail():
+    email=request.form.get('email')
+    if User.query.filter_by(email=email).first():
+        return jsonify(False)
+    return jsonify(True)
+
+@auth.route('/registervalidate/username',methods=['POST','GET'])
+def registervalidateusername():
+    username=request.form.get('username')
+    print username
+    if User.query.filter_by(username=username).first():
+        return jsonify(False)
+    return jsonify(True)
 
 @auth.route('/confirm/<token>')
 @login_required #Flask-Login提供的login_required修饰器会保护这个路由，用户点击确认邮件中的链接后，要先登录，才能执行这个函数
