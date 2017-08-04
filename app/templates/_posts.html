@@ -1,5 +1,7 @@
+<ul class="list-group">
 {% for post in posts %}
-    <div class="list-group-item" style="border: 0;">
+<li class="list-group-item">
+    <div style="border: 0;">
         <div class="post-content">
             <div class="post-information">
                 <a href="{{ url_for('.post',id=post.id) }}" style="text-decoration:none">
@@ -11,7 +13,11 @@
                         作者：<a href="{{ url_for('.user', username=post.author.username) }}" style="text-decoration:none">{{ post.author.username }}</a>
                     </small>
                     <a href="{{ url_for('.user', username=post.author.username) }}">
-                        <img class="img-rounded profile-thumbnail" src="{{ post.author.gravatar(size=20) }}">
+                        {% if post.author.real_avatar %}
+                            <img class="img-circle profile-thumbnail" src="{{ post.author.real_avatar }}" width="3%" height="3%">
+                        {% else %}
+                            <img class="img-circle profile-thumbnail" src="{{ post.author.gravatar(size=20) }}">
+                        {% endif %}
                     </a>
                 </p>
             </div>
@@ -34,4 +40,6 @@
             </div>
         </div>
     </div>
+</li>
 {% endfor %}
+</ul>

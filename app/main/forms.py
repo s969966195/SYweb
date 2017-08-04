@@ -15,8 +15,8 @@ class EditProfileForm(FlaskForm):
     submit=SubmitField(u'提交')
 
 class PostForm(FlaskForm):
-    title=StringField(u'标题',validators=[Required(),Length(0,64)])
-    text=TextAreaField(u'正文',validators=[Required()])
+    title=StringField(u'标题',validators=[Required(message=u"请输入标题"),Length(0,64)])
+    text=TextAreaField(u'正文',validators=[Required(message=u"请输入文章内容")])
     submit=SubmitField(u'提交')
 
 class CommentForm(FlaskForm):

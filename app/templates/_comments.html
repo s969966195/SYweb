@@ -1,15 +1,20 @@
-<ul class="comments">
+<ul class="list-group" style="margin-top:30px">
     {% for comment in comments %}
-    <li class="comment">
-        <div class="comment-thumbnail">
+    <li class="list-group-item">
+        <div class="comment-mation">
+            <p>
             <a href="{{ url_for('.user', username=comment.author.username) }}">
-                <img class="img-rounded profile-thumbnail" src="{{ comment.author.gravatar(size=40) }}">
+                {% if comment.author.real_avatar %}
+                <img class="img-rounded profile-thumbnail" src="{{ comment.author.real_avatar }}" width="2%" height="2%">
+                {% else %}
+                <img class="img-rounded profile-thumbnail" src="{{ comment.author.gravatar(size=20) }}">
+                {% endif %}
             </a>
+            <small><a href="{{ url_for('.user', username=comment.author.username) }}">{{ comment.author.username }}&emsp;</a></small>
+            <small>评论时间：{{ moment(comment.timestamp).fromNow() }}</small>
+            <p>
         </div>
-        <div class="comment-content">
-            <div class="comment-date">{{ moment(comment.timestamp).fromNow() }}</div>
-            <div class="comment-author"><a href="{{ url_for('.user', username=comment.author.username) }}">{{ comment.author.username }}</a></div>
-            <div class="comment-body">
+        <div class="comment-body">
                 {% if comment.disabled %}
                 <p><i>This comment has been disabled by a moderator.</i></p>
                 {% endif %}
@@ -20,7 +25,7 @@
                         {{ comment.body }}
                     {% endif %}
                 {% endif %}
-            </div>
+        </div>
             {% if moderate %}
                 <br>
                 {% if comment.disabled %}
@@ -29,7 +34,6 @@
                 <a class="btn btn-danger btn-xs" href="{{ url_for('.moderate_disable', id=comment.id, page=page) }}">Disable</a>
                 {% endif %}
             {% endif %}
-        </div>
     </li>
     {% endfor %}
 </ul>

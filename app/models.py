@@ -1,5 +1,5 @@
 #coding=utf-8
-from flask import current_app,request 
+from flask import current_app,request,url_for 
 from . import db,login_manager
 from datetime import datetime
 from werkzeug.security import generate_password_hash,check_password_hash #gph(password,method=pbkdf2:sha1,salt_length=8)将原始密码作为输入，以字符串形式输出密码的散列值，输出的值可保存在用户数据库中
@@ -64,6 +64,7 @@ class User(UserMixin,db.Model):
     member_since=db.Column(db.DateTime(),default=datetime.utcnow)
     last_seen=db.Column(db.DateTime(),default=datetime.utcnow) #用户每次访问网站后，这个值都会被刷新
     avatar_hash=db.Column(db.String(32))
+    real_avatar=db.Column(db.String(255))
     followed=db.relationship('Follow',foreign_keys=[Follow.follower_id],backref=db.backref('follower',lazy='joined'),lazy='dynamic',cascade='all,delete-orphan')
     followers=db.relationship('Follow',foreign_keys=[Follow.followed_id],backref=db.backref('followed',lazy='joined'),lazy='dynamic',cascade='all,delete-orphan')
     comments=db.relationship('Comment',backref='author',lazy='dynamic')
@@ -174,6 +175,32 @@ class User(UserMixin,db.Model):
     def followed_posts(self):
         return Post.query.join(Follow,Follow.followed_id==Post.author_id).filter(Follow.follower_id==self.id)
 
+    def generate_auth_token(self,expiration):
+        s=Serializer(current_app.config['SECRET_KEY'],expires_in=expiration)
+        return s.dumps({'id':self.id})
+
+    @staticmethod
+    def verify_auth_token(token):
+        s=Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data=s.loads(token)
+        except:
+            return None
+        return User.query.get(data['id'])
+
+    def to_json(self):
+        json_user = {
+            'url': url_for('api.get_user', id=self.id, _external=True),
+            'username': self.username,
+            'member_since': self.member_since,
+            'last_seen': self.last_seen,
+            'posts': url_for('api.get_user_posts', id=self.id, _external=True),
+            'followed_posts': url_for('api.get_user_followed_posts',
+                                      id=self.id, _external=True),
+            'post_count': self.posts.count()
+        }
+        return json_user
+
     @staticmethod
     def generate_fake(count=100):
         from sqlalchemy.exc import IntegrityError
@@ -231,6 +258,30 @@ class Post(db.Model):
     def __repr__(self):
         return "<Post '{}'>".format(self.title)
 
+    def to_json(self):
+        json_post = {
+            'url': url_for('api.get_post', id=self.id, _external=True),
+            'text': self.text,
+            'title':self.title,
+            'publish_date': self.publish_date,
+            'author': url_for('api.get_user', id=self.author_id,
+                              _external=True),
+            'comments': url_for('api.get_post_comments', id=self.id,
+                                _external=True),
+            'comment_count': self.comments.count()
+        }
+        return json_post
+
+    @staticmethod
+    def from_json(json_post):
+        text=json_post.get('text')
+        title=json_post.get('title')
+        if text is None or text=='':
+            raise ValidationError('post does not have a body')
+        if title is None or title=='':
+            raise ValidationError('post does not have a title')
+        return Post(text=text,title=title)
+
     @staticmethod
     def generate_fake(count=100):
         from random import seed, randint
@@ -269,6 +320,25 @@ class Comment(db.Model):
 
     def __repr__(self):
         return "<Comment '{}'>".format(self.text[:15])
+
+    def to_json(self):
+        json_comment = {
+            'url': url_for('api.get_comment', id=self.id, _external=True),
+            'post': url_for('api.get_post', id=self.post_id, _external=True),
+            'body': self.body,
+            'body_html': self.body_html,
+            'timestamp': self.timestamp,
+            'author': url_for('api.get_user', id=self.author_id,
+                              _external=True),
+        }
+        return json_comment
+
+    @staticmethod
+    def from_json(json_comment):
+        body = json_comment.get('body')
+        if body is None or body == '':
+            raise ValidationError('comment does not have a body')
+        return Comment(body=body)
 
     @staticmethod
     def on_changed_body(target,value,oldvalue,initiator):

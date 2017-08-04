@@ -63,6 +63,24 @@ def user(username):
     posts=pagination.items
     return render_template('user.html',user=user,posts=posts)
 
+@main.route('/change-avatar',methods=['GET','POST'])
+@login_required
+def change_avatar():
+    if request.method=="POST":
+        avatar=request.files['avatar']
+        fname=avatar.filename
+        UPLOAD_FOLDER=current_app.config['UPLOAD_FOLDER']
+        ALLOWED_EXTENSIONS=current_app.config['ALLOWED_EXTENSIONS']
+        flag='.' in fname and fname.split('.')[1] in ALLOWED_EXTENSIONS
+        if not flag:
+            flash(u'不支持该类型文件')
+            return redirect(url_for('.user',username=current_user.username))
+        avatar.save('{}{}_{}'.format(UPLOAD_FOLDER,current_user.username,fname))
+        current_user.real_avatar='/static/avatar/{}_{}'.format(current_user.username,fname)
+        db.session.add(current_user)
+        db.session.commit()
+        return redirect(url_for('.user',username=current_user.username))
+
 @main.route('/edit-profile',methods=['GET','POST'])
 @login_required
 def edit_profile():

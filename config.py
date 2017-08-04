@@ -29,8 +29,9 @@ class DevConfig(Config):
     MAIL_USERNAME=os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD=os.environ.get('MAIL_PASSWORD')
     BOOTSTRAP_SERVE_LOCAL = True
-    UPLOAD_FOLDER='~/sywebfile'
+    UPLOAD_FOLDER=os.getcwd()+'/app/static/avatar/'
     SQLALCHEMY_TRACK_MODIFICATIONS=False #如果设置成 True (默认情况)，Flask-SQLAlchemy 将会追踪对象的修改并且发送信号。这需要额外的内存， 如果不必要的可以禁用它。
+    ALLOWED_EXTENSIONS=['png','jpg','jpeg','gif']
 
 config={
     'development':DevConfig,
