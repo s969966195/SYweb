@@ -1,6 +1,6 @@
 #coding=utf-8
 from datetime import datetime
-from flask import render_template,session,redirect,url_for,flash,current_app,request,make_response
+from flask import render_template,session,redirect,url_for,flash,current_app,request,make_response,abort
 from flask_login import login_required,current_user
 from . import main
 from .forms import NameForm,EditProfileForm,PostForm,CommentForm
