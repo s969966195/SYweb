@@ -75,7 +75,7 @@ def change_avatar():
         if not flag:
             flash(u'不支持该类型文件')
             return redirect(url_for('.user',username=current_user.username))
-        avatar.save('{}{}_{}'.format(UPLOAD_FOLDER,current_user.username,fname))
+        avatar.save('{}{}_{}'.format(UPLOAD_FOLDER,str(current_user.username),str(fname)))
         current_user.real_avatar='/static/avatar/{}_{}'.format(current_user.username,fname)
         db.session.add(current_user)
         db.session.commit()
