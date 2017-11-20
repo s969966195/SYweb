@@ -265,6 +265,7 @@ class Post(db.Model):
     # text_html=db.Column(db.Text())
     comments = db.relationship('Comment', backref='post', lazy='dynamic')
     # tags=db.relationship('Tag',secondary=tags,backref=db.backref('posts',lazy='dynamic'))
+    likes = db.Column(db.Integer(), default=0)
 
     def __repr__(self):
         return "<Post '{}'>".format(self.title)
