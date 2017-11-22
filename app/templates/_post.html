@@ -18,9 +18,9 @@
                 {{ post.text|markdown|safe }}
             </div>
             <div class="post-footer" style="text-align:right">
-                <a href="#" style="text-decoration:none">
-                    <span class="label label-primary">喜欢{{ post.likes }}</span>
-                </a>
+                <form method="POST">
+                    <button class="btn btn-primary btn-xs" value="like">喜欢{{ post.likes }}</button>
+                </form>
                 {% if current_user==post.author %}
                 <a href="{{ url_for('.edit_post',id=post.id) }}" style="text-decoration:none">
                     <span class="label label-primary">编辑</span>
