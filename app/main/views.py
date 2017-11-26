@@ -126,6 +126,16 @@ def post(id):
     return render_template('post.html', posts=[post], form=form, comments=comments, pagination=pagination)
 
 
+@main.route('/like/<int:id>', methods=['GET', 'POST'])
+def like(id):
+    post = Post.query.get_or_404(id)
+    user = current_user._get_current_object()
+    post.like.append(user)
+    db.session.add(post)
+    db.session.commit()
+    return 'OK'
+
+
 @main.route('/edit-post/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_post(id):
