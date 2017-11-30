@@ -126,14 +126,14 @@ def post(id):
     return render_template('post.html', posts=[post], form=form, comments=comments, pagination=pagination)
 
 
-@main.route('/like/<int:id>', methods=['GET', 'POST'])
+@main.route('/like/<int:id>', methods=['GET'])
 def like(id):
     post = Post.query.get_or_404(id)
     user = current_user._get_current_object()
     post.like.append(user)
     db.session.add(post)
     db.session.commit()
-    return 'OK'
+    return redirect(url_for('.post', id=post.id))
 
 
 @main.route('/edit-post/<int:id>', methods=['GET', 'POST'])

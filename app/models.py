@@ -255,8 +255,8 @@ tags=db.Table('post_tags',
 '''
 
 
-likes = db.Table(
-    db.Column('user_id', db.Integer, db.ForeignKey('users.id'))
+likes = db.Table('post_likes',
+    db.Column('userlike_id', db.Integer, db.ForeignKey('users.id')),
     db.Column('post_id', db.Integer, db.ForeignKey('posts.id'))
 )
 
@@ -271,8 +271,8 @@ class Post(db.Model):
     # text_html=db.Column(db.Text())
     comments = db.relationship('Comment', backref='post', lazy='dynamic')
     # tags=db.relationship('Tag',secondary=tags,backref=db.backref('posts',lazy='dynamic'))
-    like = db.relationship('User', secondary=likes, 
-                                    backref=db.backref('posts', lazy='dynamic'), 
+    like = db.relationship('User', secondary=likes,
+                                    backref=db.backref('like_posts', lazy='dynamic'),
                                     lazy='dynamic')
 
     def __repr__(self):
